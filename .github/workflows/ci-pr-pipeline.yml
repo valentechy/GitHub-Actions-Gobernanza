@@ -33,12 +33,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # ESTRATEGIA: Solo se ejecuta si el JSON decía "java"
-      - name: Build Java Strategy
+      # ESTRATEGIA JAVA
+      - name: Build Java
         if: ${{ needs.validation.outputs.language == 'java' }}
         uses: valentechy/GitHub-Actions-Gobernanza/actions/build-java@main
         with:
-          version: ${{ needs.validation.outputs.java_version }}
+          version: ${{ needs.validation.outputs.version }}
+
+      # ESTRATEGIA .NET
+      - name: Build .NET
+        if: ${{ needs.validation.outputs.language == 'dotnet' }}
+        uses: valentechy/GitHub-Actions-Gobernanza/actions/build-dotnet@main
+        with:
+          version: ${{ needs.validation.outputs.version }}
+
+      # ESTRATEGIA GO
+      - name: Build Go
+        if: ${{ needs.validation.outputs.language == 'go' }}
+        uses: valentechy/GitHub-Actions-Gobernanza/actions/build-go@main
+        with:
+          version: ${{ needs.validation.outputs.version }}
 
       # Aquí añadirías el bloque para .NET en el futuro
       - name: Build .NET Strategy

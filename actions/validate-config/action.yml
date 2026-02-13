@@ -1,34 +1,63 @@
-name: 'Validate Configuration'
-description: 'Lee y valida el config.json'
+name: 'Validate Configuration (JSON Schema)'
+description: 'Valida el project-config.json contra un esquema estricto y exporta variables'
 outputs:
   language:
-    description: "Lenguaje detectado"
-    value: ${{ steps.read_config.outputs.language }}
-  java_version:
-    description: "Versión de Java (si aplica)"
-    value: ${{ steps.read_config.outputs.java_version }}
+    description: "Lenguaje validado"
+    value: ${{ steps.export.outputs.language }}
+  version:
+    description: "Versión validada"
+    value: ${{ steps.export.outputs.version }}
+  security_level:
+    description: "Nivel de seguridad"
+    value: ${{ steps.export.outputs.security_level }}
 
 runs:
   using: "composite"
   steps:
-    - name: Verificar existencia de fichero
+    # 1. Verificar existencia del archivo
+    - name: Check file existence
       run: |
-        if [ ! -f "app/config.json" ]; then
-          echo "Error: No se encuentra app/config.json"
+        if [ ! -f "project-config.json" ]; then
+          echo "ERROR CRÍTICO: No se encuentra 'project-config.json' en la raíz."
           exit 1
         fi
       shell: bash
 
-    - name: Leer configuración
-      id: read_config
+    # 2. Preparar entorno Node (rápido y necesario para AJV)
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    # 3. VALIDACIÓN FUERTE (El Gatekeeper)
+    # ${{ github.action_path }} es la ruta donde está esta action en el runner
+    - name: Validate JSON Schema
       run: |
-        # Usamos jq (instalado por defecto en runners) para leer el json
-        LANG=$(jq -r .language app/config.json)
-        VER=$(jq -r .version app/config.json)
+        echo "Validando configuración contra el esquema corporativo..."
         
-        echo "Configuración válida. Lenguaje: $LANG, Versión: $VER"
+        # Instalamos el validador al vuelo (es muy ligero) y validamos
+        npx -y ajv-cli validate -s ${{ github.action_path }}/schemas/project-config.json -d project-config.json
         
-        # Exportamos variables para los siguientes pasos
+        if [ $? -eq 0 ]; then
+          echo "Configuración VÁLIDA. Cumple con los estándares."
+        else
+          echo "ERROR DE GOBERNANZA: El archivo project-config.json no cumple el esquema."
+          exit 1
+        fi
+      shell: bash
+
+    # 4. Exportar variables (Solo si pasó la validación anterior)
+    - name: Export Config Variables
+      id: export
+      run: |
+        # Usamos jq para extraer valores seguros
+        LANG=$(jq -r .language project-config.json)
+        VER=$(jq -r .version project-config.json)
+        SEC=$(jq -r '.security_level // "medium"' project-config.json) # Default medium
+        
         echo "language=$LANG" >> $GITHUB_OUTPUT
-        echo "java_version=$VER" >> $GITHUB_OUTPUT
+        echo "version=$VER" >> $GITHUB_OUTPUT
+        echo "security_level=$SEC" >> $GITHUB_OUTPUT
+        
+        echo "Variables detectadas: Lang=$LANG, Ver=$VER, Sec=$SEC"
       shell: bash
