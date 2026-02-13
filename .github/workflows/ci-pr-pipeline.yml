@@ -22,8 +22,9 @@ jobs:
     needs: validation
     runs-on: ubuntu-latest
     steps:
-      - name: Global Setup
-        run: echo "Preparando variables de entorno globales, Docker containers, etc..."
+      - name: Environment Preparation
+        if: ${{ needs.validation.outputs.language == 'java' }}
+        uses: valentechy/GitHub-Actions-Gobernanza/actions/environment-preparation@main
 
   # STAGE 3: COMPILATION (MODULAR)
   build:
