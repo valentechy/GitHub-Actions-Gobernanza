@@ -1,8 +1,8 @@
 name: 'Security Suite'
-description: 'Ejecuta Linter, SAST y Secret Detection'
+description: 'Ejecuta Linter, SAST y Secret Detection -- SEPARAR?'
 
 runs:
-  using: "composite TODO: SEPARAR?"
+  using: "composite"
   steps:
     - name: 1. Linter
       run: echo "Ejecutando Linter (Checkstyle/ESLint)..."
