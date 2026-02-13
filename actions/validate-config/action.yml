@@ -38,7 +38,7 @@ runs:
         echo "Validando configuración contra el esquema corporativo..."
         
         # Instalamos el validador al vuelo (es muy ligero) y validamos
-        npx -y ajv-cli validate -s ${{ github.action_path }}/schemas/config-schema.json -d app/config.json
+        npx -y ajv-cli validate --all-errors -s ${{ github.action_path }}/schemas/config-schema.json -d app/config.json
         
         if [ $? -eq 0 ]; then
           echo "Configuración VÁLIDA. Cumple con los estándares."
