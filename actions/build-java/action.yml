@@ -1,0 +1,15 @@
+name: 'Build Java'
+description: 'Compila proyectos Java'
+inputs:
+  version:
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Java
+      run: echo "Configurando Java versión ${{ inputs.version }}"
+      shell: bash
+    - name: Maven Build
+      run: echo "Ejecutando mvn clean install..."
+      shell: bash
