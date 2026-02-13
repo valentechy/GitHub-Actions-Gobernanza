@@ -1,0 +1,23 @@
+name: Pipeline Estándar Reutilizable
+on:
+  workflow_call:
+    inputs:
+      target-env:
+        description: 'Entorno de destino'
+        required: false
+        default: 'dev'
+        type: string
+
+jobs:
+  checkout-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inicio del Pipeline de Gobernanza
+        run: echo "Iniciando pipeline gobernada para entorno ${{ inputs.target-env }}"
+
+      # AQUÍ LLAMAMOS A LA ACTION COMPUESTA
+      # Importante: Usa la ruta completa: usuario/repo/ruta/action@rama
+      - name: Ejecutar Fake Checkout
+        uses: valentechy/GitHub-Actions-Gobernanza/actions/fake-checkout@main
+        with:
+          branch-name: 'feature/prueba-gobernanza'

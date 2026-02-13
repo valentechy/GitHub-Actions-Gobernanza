@@ -1,0 +1,6 @@
+# .github/workflows/main.yml
+jobs:
+  call-ci:
+    uses: valentechy/github-actions-gobernanza/.github/workflows/standard-ci.yml@main
+    with:
+      version: '18'

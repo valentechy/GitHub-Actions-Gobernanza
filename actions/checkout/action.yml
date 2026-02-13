@@ -1,0 +1,16 @@
+name: 'Fake Checkout'
+description: 'Simula un checkout imprimiendo un mensaje'
+inputs:
+  branch-name:
+    description: 'Rama a simular'
+    required: false
+    default: 'main'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Imprimir mensaje de checkout
+      run: |
+        echo "Simulando git checkout de la rama: ${{ inputs.branch-name }}"
+        echo "Código descargado correctamente (falso)"
+      shell: bash  # Obligatorio en composite actions!
