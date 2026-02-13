@@ -1,0 +1,34 @@
+name: 'Validate Configuration'
+description: 'Lee y valida el project-config.json'
+outputs:
+  language:
+    description: "Lenguaje detectado"
+    value: ${{ steps.read_config.outputs.language }}
+  java_version:
+    description: "Versión de Java (si aplica)"
+    value: ${{ steps.read_config.outputs.java_version }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Verificar existencia de fichero
+      run: |
+        if [ ! -f "project-config.json" ]; then
+          echo "Error: No se encuentra project-config.json"
+          exit 1
+        fi
+      shell: bash
+
+    - name: Leer configuración
+      id: read_config
+      run: |
+        # Usamos jq (instalado por defecto en runners) para leer el json
+        LANG=$(jq -r .language project-config.json)
+        VER=$(jq -r .version project-config.json)
+        
+        echo "Configuración válida. Lenguaje: $LANG, Versión: $VER"
+        
+        # Exportamos variables para los siguientes pasos
+        echo "language=$LANG" >> $GITHUB_OUTPUT
+        echo "java_version=$VER" >> $GITHUB_OUTPUT
+      shell: bash

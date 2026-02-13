@@ -1,23 +1,55 @@
-name: Pipeline Estándar Reutilizable
+name: Pipeline PR Estándar
 on:
   workflow_call:
-    inputs:
-      target-env:
-        description: 'Entorno de destino'
-        required: false
-        default: 'dev'
-        type: string
+    # No necesitamos inputs, todo se lee del config.json del repo usuario
 
 jobs:
-  checkout-and-verify:
+  # STAGE 1: VALIDATION & CONFIG
+  validation:
+    runs-on: ubuntu-latest
+    outputs:
+      language: ${{ steps.validate.outputs.language }}
+      java_version: ${{ steps.validate.outputs.java_version }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Validar Configuración
+        id: validate
+        uses: valentechy/GitHub-Actions-Gobernanza/actions/validate-config@main
+
+  # STAGE 2: ENVIRONMENT PREPARATION
+  env-prep:
+    needs: validation
     runs-on: ubuntu-latest
     steps:
-      - name: Inicio del Pipeline de Gobernanza
-        run: echo "Iniciando pipeline gobernada para entorno ${{ inputs.target-env }}"
+      - name: Global Setup
+        run: echo "Preparando variables de entorno globales, Docker containers, etc..."
 
-      # AQUÍ LLAMAMOS A LA ACTION COMPUESTA
-      # Importante: Usa la ruta completa: usuario/repo/ruta/action@rama
-      - name: Ejecutar Fake Checkout
-        uses: valentechy/GitHub-Actions-Gobernanza/actions/checkout@main
+  # STAGE 3: COMPILATION (MODULAR)
+  build:
+    needs: [validation, env-prep]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # ESTRATEGIA: Solo se ejecuta si el JSON decía "java"
+      - name: Build Java Strategy
+        if: ${{ needs.validation.outputs.language == 'java' }}
+        uses: valentechy/GitHub-Actions-Gobernanza/actions/build-java@main
         with:
-          branch-name: 'feature/prueba-gobernanza'
+          version: ${{ needs.validation.outputs.java_version }}
+
+      # Aquí añadirías el bloque para .NET en el futuro
+      - name: Build .NET Strategy
+        if: ${{ needs.validation.outputs.language == 'dotnet' }}
+        run: echo "Aquí iría la action de .NET"
+
+  # STAGE 4: SECURITY
+  security:
+    needs: build # Opcional: puedes ponerlo en paralelo quitando el needs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Ejecutar Suite de Seguridad
+        uses: valentechy/GitHub-Actions-Gobernanza/actions/security-suite@main

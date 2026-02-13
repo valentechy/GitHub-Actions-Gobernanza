@@ -1,0 +1,11 @@
+name: 'Environment Preparation'
+description: 'Configuración General del Entorno'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Configuración Entorno
+      id: read_config
+      run: |
+        echo "Configuración Entorno."
+      shell: bash
