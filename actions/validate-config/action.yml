@@ -32,6 +32,8 @@ runs:
     # 3. VALIDACIÓN FUERTE (El Gatekeeper)
     # ${{ github.action_path }} es la ruta donde está esta action en el runner
     - name: Validate JSON Schema
+      env:
+        NPM_CONFIG_LOGLEVEL: error
       run: |
         echo "Validando configuración contra el esquema corporativo..."
         
