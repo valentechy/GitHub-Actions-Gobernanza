@@ -1,5 +1,5 @@
 name: 'Validate Configuration (JSON Schema)'
-description: 'Valida el project-config.json contra un esquema estricto y exporta variables'
+description: 'Valida el app/config.json contra un esquema estricto y exporta variables'
 outputs:
   language:
     description: "Lenguaje validado"
@@ -17,8 +17,8 @@ runs:
     # 1. Verificar existencia del archivo
     - name: Check file existence
       run: |
-        if [ ! -f "project-config.json" ]; then
-          echo "ERROR CRÍTICO: No se encuentra 'project-config.json' en la raíz."
+        if [ ! -f "app/config.json" ]; then
+          echo "ERROR CRÍTICO: No se encuentra 'app/config.json' en la raíz."
           exit 1
         fi
       shell: bash
@@ -36,12 +36,12 @@ runs:
         echo "Validando configuración contra el esquema corporativo..."
         
         # Instalamos el validador al vuelo (es muy ligero) y validamos
-        npx -y ajv-cli validate -s ${{ github.action_path }}/schemas/project-config.json -d project-config.json
+        npx -y ajv-cli validate -s ${{ github.action_path }}/schemas/project-config.json -d app/config.json
         
         if [ $? -eq 0 ]; then
           echo "Configuración VÁLIDA. Cumple con los estándares."
         else
-          echo "ERROR DE GOBERNANZA: El archivo project-config.json no cumple el esquema."
+          echo "ERROR DE GOBERNANZA: El archivo app/config.json no cumple el esquema."
           exit 1
         fi
       shell: bash
@@ -51,9 +51,9 @@ runs:
       id: export
       run: |
         # Usamos jq para extraer valores seguros
-        LANG=$(jq -r .language project-config.json)
-        VER=$(jq -r .version project-config.json)
-        SEC=$(jq -r '.security_level // "medium"' project-config.json) # Default medium
+        LANG=$(jq -r .language app/config.json)
+        VER=$(jq -r .version app/config.json)
+        SEC=$(jq -r '.security_level // "medium"' app/config.json) # Default medium
         
         echo "language=$LANG" >> $GITHUB_OUTPUT
         echo "version=$VER" >> $GITHUB_OUTPUT
