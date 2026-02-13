@@ -1,5 +1,5 @@
 name: 'Validate Configuration'
-description: 'Lee y valida el project-config.json'
+description: 'Lee y valida el config.json'
 outputs:
   language:
     description: "Lenguaje detectado"
@@ -13,8 +13,8 @@ runs:
   steps:
     - name: Verificar existencia de fichero
       run: |
-        if [ ! -f "project-config.json" ]; then
-          echo "Error: No se encuentra project-config.json"
+        if [ ! -f "config.json" ]; then
+          echo "Error: No se encuentra config.json"
           exit 1
         fi
       shell: bash
@@ -23,8 +23,8 @@ runs:
       id: read_config
       run: |
         # Usamos jq (instalado por defecto en runners) para leer el json
-        LANG=$(jq -r .language project-config.json)
-        VER=$(jq -r .version project-config.json)
+        LANG=$(jq -r .language config.json)
+        VER=$(jq -r .version config.json)
         
         echo "Configuración válida. Lenguaje: $LANG, Versión: $VER"
         
