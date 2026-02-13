@@ -1,0 +1,15 @@
+name: 'Build Go'
+description: 'Compila binarios Go'
+inputs:
+  version: { required: true }
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: ${{ inputs.version }}
+    - name: Go Build
+      run: echo "go build -v ./..."
+      shell: bash

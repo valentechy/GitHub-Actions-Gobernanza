@@ -1,0 +1,15 @@
+name: 'Build .NET'
+description: 'Compila soluciones .NET Core'
+inputs:
+  version: { required: true }
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ inputs.version }}
+    - name: Dotnet Build
+      run: echo "dotnet build --configuration Release"
+      shell: bash
