@@ -13,8 +13,8 @@ runs:
   steps:
     - name: Verificar existencia de fichero
       run: |
-        if [ ! -f "config.json" ]; then
-          echo "Error: No se encuentra config.json"
+        if [ ! -f "app/config.json" ]; then
+          echo "Error: No se encuentra app/config.json"
           exit 1
         fi
       shell: bash
@@ -23,8 +23,8 @@ runs:
       id: read_config
       run: |
         # Usamos jq (instalado por defecto en runners) para leer el json
-        LANG=$(jq -r .language config.json)
-        VER=$(jq -r .version config.json)
+        LANG=$(jq -r .language app/config.json)
+        VER=$(jq -r .version app/config.json)
         
         echo "Configuración válida. Lenguaje: $LANG, Versión: $VER"
         
